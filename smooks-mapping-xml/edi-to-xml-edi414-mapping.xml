@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<medi:edimap xmlns:medi="http://www.milyn.org/schema/edi-message-mapping-1.4.xsd">
+
+<medi:description name="414" version="1.0"  />
+	<medi:delimiters segment="&#10;" field="*" component="^" sub-component="~"/>
+	<medi:segments xmltag="EDI-414">
+
+		<medi:segment xmltag="GS" segcode="GS"
+					  description="Functional Group Header"  maxOccurs="-1" minOccurs="0"  >
+			<medi:field xmltag="GS01" />
+			<medi:field xmltag="GS02" />
+			<medi:field xmltag="GS03" />
+			<medi:field xmltag="GS04" />
+			<medi:field xmltag="GS05" />
+			<medi:field xmltag="GS06" />
+			<medi:field xmltag="GS07" />
+			<medi:field xmltag="GS08"  />
+		</medi:segment>
+
+		<medi:segmentGroup xmltag="LOOP_ID-ST"
+						   maxOccurs="-1" minOccurs="0" >
+
+			<medi:segment xmltag="ST" segcode="ST"
+						  description="Transaction Set Header"  maxOccurs="-1" minOccurs="0"   truncatable="true"  >
+				<medi:field xmltag="ST01" />
+				<medi:field xmltag="ST02" />
+				<medi:field xmltag="ST03"  />
+			</medi:segment>
+
+			<medi:segmentGroup xmltag="LOOP_ID-CTC"
+							   maxOccurs="-11" minOccurs="0" >
+				<medi:segment xmltag="CTC" segcode="CTC"
+							  description="Car Hire Transaction Control"  maxOccurs="1" minOccurs="0"  >
+					<medi:field xmltag="CTC01" />
+					<medi:field xmltag="CTC02" />
+					<medi:field xmltag="CTC03" />
+					<medi:field xmltag="CTC04" />
+					<medi:field xmltag="CTC05" />
+					<medi:field xmltag="CTC06" />
+					<medi:field xmltag="CTC07" />
+					<medi:field xmltag="CTC08" />
+					<medi:field xmltag="CTC09" />
+					<medi:field xmltag="CTC10" />
+					<medi:field xmltag="CTC11" />
+					<medi:field xmltag="CTC12" />
+				</medi:segment>
+
+				<medi:segmentGroup xmltag="LOOP_ID-CIC"
+								   maxOccurs="-1" minOccurs="0" >
+
+					<medi:segment xmltag="CIC" segcode="CIC"
+								  description="Car Information Control"  maxOccurs="1" minOccurs="0"  >
+						<medi:field xmltag="CIC01" />
+						<medi:field xmltag="CIC02" />
+						<medi:field xmltag="CIC03" />
+					</medi:segment>
+
+					<medi:segmentGroup xmltag="LOOP_ID-LX"
+									   maxOccurs="-1" minOccurs="0" >
+
+						<medi:segment xmltag="LX" segcode="LX"
+									  description="Sequential Number"  maxOccurs="1" minOccurs="0"  >
+							<medi:field xmltag="LX01" />
+						</medi:segment>
+
+						<medi:segment xmltag="CHR" segcode="CHR"
+									  description="Car Hire Rates"  maxOccurs="3" minOccurs="0"  >
+							<!--<medi:field  xmltag="ediMsgOrderId" />-->
+							<medi:field xmltag="CHR01" />
+							<medi:field xmltag="CHR02" />
+							<medi:field xmltag="CHR03" />
+						</medi:segment>
+
+						<medi:segment xmltag="CYC" segcode="CYC"
+									  description="Car Hire Cycle / Period"  maxOccurs="2" minOccurs="0"  truncatable="true" >
+							<medi:field xmltag="CYC01" />
+							<medi:field xmltag="CYC02" />
+							<medi:field xmltag="CYC03" />
+							<medi:field xmltag="CYC04" />
+							<medi:field xmltag="CYC05" />
+							<medi:field xmltag="CYC06" />
+							<medi:field xmltag="CYC07"   />
+						</medi:segment>
+
+						<medi:segment xmltag="L7A" segcode="L7A"
+									  description="Contract Reference Identifier"  maxOccurs="1" minOccurs="0" truncatable="true" >
+							<!--<medi:field  xmltag="ediMsgOrderId" />-->
+							<medi:field xmltag="L7A01" />
+							<medi:field xmltag="L7A02" />
+							<medi:field xmltag="L7A03" />
+							<medi:field xmltag="L7A04" />
+							<medi:field xmltag="L7A05" />
+							<medi:field xmltag="L7A06" />
+							<medi:field xmltag="L7A07" />
+							<medi:field xmltag="L7A08" />
+						</medi:segment>
+
+
+						<medi:segment xmltag="REF" segcode="REF"
+									  description="Reference Numbers"  maxOccurs="1" minOccurs="0"  >
+							<medi:field xmltag="REF01" />
+							<medi:field xmltag="REF02" />
+							<medi:field xmltag="REF03" />
+						</medi:segment>
+
+						<medi:segment xmltag="CV" segcode="CV"
+									  description="Cycle / Summary Value"  maxOccurs="1" minOccurs="0"  truncatable="true" >
+							<medi:field xmltag="CV01" />
+							<medi:field xmltag="CV02" />
+							<medi:field xmltag="CV03" />
+							<medi:field xmltag="CV04" />
+							<medi:field xmltag="CV05" />
+							<medi:field xmltag="CV06" />
+							<medi:field xmltag="CV07" />
+							<medi:field xmltag="CV08" />
+							<medi:field xmltag="CV09" />
+							<medi:field xmltag="CV10" />
+							<medi:field xmltag="CV10" />
+							<medi:field xmltag="CV11" />
+							<medi:field xmltag="CV12" />
+							<medi:field xmltag="CV13"  />
+							<medi:field xmltag="CV14"  />
+						</medi:segment>
+
+
+					</medi:segmentGroup>
+
+				</medi:segmentGroup>
+
+			</medi:segmentGroup>
+
+			<medi:segment xmltag="SE" segcode="SE"
+						  description="Transaction Set Trailer"  maxOccurs="-1" minOccurs="0"  >
+				<medi:field xmltag="SE01" />
+				<medi:field xmltag="SE02" />
+
+			</medi:segment>
+
+		</medi:segmentGroup>
+		<medi:segment xmltag="GE" segcode="GE"
+					  description="Functional Group Trailer"  maxOccurs="-1" minOccurs="0"  >
+			<medi:field xmltag="GE01" />
+			<medi:field xmltag="GE02" />
+		</medi:segment>
+
+	</medi:segments>
+</medi:edimap>

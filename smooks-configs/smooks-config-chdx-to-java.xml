@@ -1,0 +1,278 @@
+<?xml version="1.0"?>
+<smooks-resource-list
+        xmlns="http://www.milyn.org/xsd/smooks-1.1.xsd"
+        xmlns:core="http://www.milyn.org/xsd/smooks/smooks-core-1.3.xsd"
+        xmlns:edi="http://www.milyn.org/xsd/smooks/edi-1.1.xsd"
+        xmlns:jb="http://www.milyn.org/xsd/smooks/javabean-1.2.xsd">
+
+    <core:filterSettings type="SAX" />
+
+    <!--
+    Configure the EDI Reader to process the message stream into a stream of SAX events.
+    -->
+    <edi:reader mappingModel="/smooks-mapping-xml/edi-to-xml-edi414-mapping.xml" />
+
+    <jb:bean beanId="cycles" class="main.java.example.model.ReceivablesCycleList" createOnElement="EDI-414">
+        <jb:wiring property="cycleList" beanIdRef="ReceivableCycleList"/>
+    </jb:bean>
+
+    <jb:bean beanId="ReceivableCycleList" class="java.util.ArrayList" createOnElement="EDI-414">
+        <jb:wiring beanIdRef="receivableCycle" />
+    </jb:bean>
+
+    <jb:bean beanId="receivableCycle" class="main.java.example.model.ReceivablesCycle" createOnElement="LX">
+        <jb:expression property="payor">
+            ediCtcTransformedProperties["payor"];
+        </jb:expression>
+        <jb:expression property="payee">
+            ediCtcTransformedProperties["payee"];
+        </jb:expression>
+        <jb:expression property="recordType">
+            ediCtcTransformedProperties["recordType"];
+        </jb:expression>
+        <jb:expression property="accountTypeCd">
+            ediCtcTransformedProperties["accountTypeCd"];
+        </jb:expression>
+        <jb:expression property="transactionQualifierCd">
+            ediCtcTransformedProperties["transactionQualifierCd"];
+        </jb:expression>
+        <jb:expression property="allowedMonth">
+            ediCtcTransformedProperties["allowedCentury"] + ediCtcTransformedProperties["allowedYear"] + ediCtcTransformedProperties["allowedMonth"];
+        </jb:expression>
+        <jb:expression property="earnedMonth" >
+            ediCtcTransformedProperties["earnedCentury"] + ediCtcTransformedProperties["earnedYear"] + ediCtcTransformedProperties["earnedMonth"];
+        </jb:expression>
+        <jb:expression property="accountDescriptionCd">
+            if(!((receivableCycle.accountTypeCd == "860") or (receivableCycle.accountTypeCd == "925"))){
+            ediCtcTransformedProperties["accountDescriptionCd"];
+            }
+        </jb:expression>
+        <jb:expression property="stateTaxCd">
+            if((receivableCycle.accountTypeCd == "860") or (receivableCycle.accountTypeCd == "925")){
+            ediCtcTransformedProperties["accountDescriptionCd"];
+            }
+        </jb:expression>
+        <jb:expression property="equipmentInitial" >
+            ediCICTransformedProperties["equipmentInitial"];
+        </jb:expression>
+        <jb:expression property="equipmentNumber" >
+            ediCICTransformedProperties["equipmentNumber"];
+        </jb:expression>
+        <jb:expression property="aarEquipmentType">
+            ediCICTransformedProperties["aarEquipmentType"];
+        </jb:expression>
+        <jb:value property="referenceNumberQualifier" data="REF/REF01"/>
+        <jb:value property="referenceNumber" data="REF/REF02"/>
+        <jb:value property="referenceDescription" data="REF/REF03"/>
+        <jb:value property="rateSource" data="CHR/CHR01"/>
+        <jb:expression property="timeRate" execOnElement="CHR/CHR03">
+            if(ediCHRTransformedProperties["rateType"] == "TR"){
+            new Double(_VALUE);
+            }else{
+            if(receivableCycle.timeRate == null){
+            new Double("0.00");
+            }
+            }
+        </jb:expression>
+        <jb:expression property="mileRate" execOnElement="CHR/CHR03">
+            if(ediCHRTransformedProperties["rateType"] == "MR"){
+            new Double(_VALUE);
+            }else{
+            if(receivableCycle.mileRate == null){
+            new Double("0.000");
+            }
+            }
+        </jb:expression>
+        <jb:expression property="appurtenanceRate" execOnElement="CHR/CHR03">
+            if(ediCHRTransformedProperties["rateType"] == "AR"){
+            new Double(_VALUE);
+            }else{
+            if(receivableCycle.appurtenanceRate == null){
+            new Double("0.00");
+            }
+            }
+        </jb:expression>
+        <jb:expression property="begDate" execOnElement="CYC/CYC04">
+            var month = ediCYCTransformedProperties["begMonth"];
+            if(month.toString().length() == 1){
+            month = "0"+ ediCYCTransformedProperties["begMonth"];
+            }
+            date = ediCYCTransformedProperties["begCentury"]+""+ediCYCTransformedProperties["begYear"]+""+month;
+        </jb:expression>
+        <jb:expression property="begHour" execOnElement="CYC/CYC04">
+            if(receivableCycle.begHour == null){
+            new Integer(_VALUE);
+            }
+        </jb:expression>
+        <jb:expression property="begDateAndTime" execOnElement="CYC/CYC05">
+            var year =  ediCYCTransformedProperties["begCentury"]+""+ediCYCTransformedProperties["begYear"];
+            var month = ediCYCTransformedProperties["begMonth"];
+            var day = "01";
+            var hours = "00";
+            var minutes = "00";
+
+            if(!(receivableCycle.begHour.equals(0))){
+            day = new Integer(receivableCycle.begHour / 24).toString();
+            hours = new Integer((receivableCycle.begHour % 24)).toString();
+            minutes = new Integer((receivableCycle.begHour * 60) % 60).toString();
+            }
+
+            dateAndTime = year + "-" + month + "-" + day + " " + hours + ":" + minutes;
+            new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dateAndTime);
+        </jb:expression>
+        <jb:expression property="begSplc" execOnElement="CYC/CYC05">
+            if(receivableCycle.begSplc == null){
+            new String(_VALUE);
+            }
+        </jb:expression>
+        <jb:expression property="begRoad" execOnElement="CYC/CYC06">
+            if(receivableCycle.begRoad == null){
+            new String(_VALUE);
+            }
+        </jb:expression>
+        <jb:expression property="endDate" execOnElement="CYC/CYC04">
+            var month = ediCYCTransformedProperties["endMonth"];
+            if(month.toString().length() == 1){
+            month = "0"+ ediCYCTransformedProperties["endMonth"];
+            }
+            date = ediCYCTransformedProperties["endCentury"]+""+ediCYCTransformedProperties["endYear"]+""+month;
+        </jb:expression>
+        <jb:expression property="endHour" execOnElement="CYC/CYC04">
+            if(receivableCycle.begHour != null){
+            new Integer(_VALUE);
+            }
+        </jb:expression>
+        <jb:expression property="endDateAndTime" execOnElement="CYC/CYC05">
+            var year =  ediCYCTransformedProperties["endCentury"]+""+ediCYCTransformedProperties["endYear"];
+            var month = ediCYCTransformedProperties["endMonth"];
+            var day = "01";
+            var hours = "00";
+            var minutes = "00";
+
+            if(!(receivableCycle.endHour.equals(0))){
+            day = new Integer(receivableCycle.endHour / 24).toString();
+            hours = new Integer((receivableCycle.endHour % 24)).toString();
+            minutes = new Integer((receivableCycle.endHour * 60) % 60).toString();
+            }
+
+            dateAndTime = year + "-" + month + "-" + day +" " + hours + ":" + minutes;
+            new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dateAndTime);
+        </jb:expression>
+        <jb:expression property="endSplc" execOnElement="CYC/CYC05">
+            if(receivableCycle.begSplc != null){
+            new String(_VALUE);
+            }
+        </jb:expression>
+        <jb:expression property="endRoad" execOnElement="CYC/CYC06">
+            if(receivableCycle.begRoad != null){
+            new String(_VALUE);
+            }
+        </jb:expression>
+        <jb:value property="aarPoolCd" decoder="Integer" data="CYC/CYC07"/>
+        <jb:value property="contractRefNumQualifer" data="L7A/L7A01"/>
+        <jb:value property="contractRegAgencyCd" data="L7A/L7A02"/>
+        <jb:value property="contractScac" data="L7A/L7A03"/>
+        <jb:value property="issuingCarrierIdentifier" data="L7A/L7A04"/>
+        <jb:value property="contractNumber" data="L7A/L7A05"/>
+        <jb:value property="contractSuffix" data="L7A/L7A06"/>
+        <jb:value property="contractEffectiveDate" data="L7A/L7A07"/>
+        <jb:value property="contractExpirationDate" data="L7A/L7A08"/>
+        <jb:expression property="cycleStatusCd" execOnElement="CV/CV01">
+
+        </jb:expression>
+        <jb:value property="payCode" data="CV/CV02"/>
+        <jb:value property="carTypeGroupCd" data="CV/CV03"/>
+        <jb:value property="timeIndicator" data="CV/CV04"/>
+        <jb:value property="timeUnits" decoder="Integer" data="CV/CV05"/>
+        <jb:value property="mileageSettlementCd" data="CV/CV06"/>
+        <jb:value property="loadedMiles" decoder="Integer" data="CV/CV07"/>
+        <jb:value property="emptyMiles"  decoder="Integer" data="CV/CV08"/>
+        <jb:value property="totalAmount" decoder="Double" data="CV/CV09">
+            <jb:decodeParam name="format">#.##</jb:decodeParam>
+        </jb:value>
+        <jb:value property="timeAmount" decoder="Double" data="CV/CV10">
+            <jb:decodeParam name="format">#.##</jb:decodeParam>
+        </jb:value>
+        <jb:value property="mileAmount" decoder="Double" data="CV/CV11">
+            <jb:decodeParam name="format">#.##</jb:decodeParam>
+        </jb:value>
+        <jb:value property="appurtenanceAmount" decoder="Double" data="CV/CV12">
+            <jb:decodeParam name="format">#.##</jb:decodeParam>
+        </jb:value>
+        <jb:value property="penaltyAmount" decoder="Double" data="CV/CV13">
+            <jb:decodeParam name="format">#.##</jb:decodeParam>
+        </jb:value>
+        <jb:value property="penaltyCd" data="CV/CV14"/>
+    </jb:bean>
+
+    <jb:bean beanId="ediCtcTransformedProperties" class="java.util.HashMap" createOnElement="CTC">
+        <jb:value property="payor" data="CTC01"/>
+        <jb:value property="payee" data="CTC02"/>
+        <jb:value property="recordType" data="CTC03"/>
+        <jb:value property="accountTypeCd" data="CTC04"/>
+        <jb:value property="transactionQualifierCd" data="CTC05"/>
+        <jb:value property="allowedCentury" data="CTC06" />
+        <jb:value property="allowedYear" data="CTC07" />
+        <jb:value property="allowedMonth" data="CTC08" />
+        <jb:value property="earnedCentury" data="CTC09" />
+        <jb:value property="earnedYear" data="CTC10" />
+        <jb:value property="earnedMonth" data="CTC11" />
+        <jb:value property="accountDescriptionCd" data="CTC12"/>
+    </jb:bean>
+
+    <jb:bean beanId="ediCICTransformedProperties" class="java.util.HashMap" createOnElement="CIC">
+        <jb:value property="equipmentInitial" data="CIC01"/>
+        <jb:value property="equipmentNumber" data="CIC02"/>
+        <jb:value property="aarEquipmentType" data="CIC03"/>
+    </jb:bean>
+
+    <jb:bean beanId="ediCHRTransformedProperties" class="java.util.HashMap" createOnElement="CHR">
+        <jb:value property="rateType" data="CHR/CHR02"/>
+    </jb:bean>
+
+    <jb:bean beanId="ediCYCTransformedProperties" class="java.util.HashMap" createOnElement="LX">
+        <jb:expression property="begCentury" execOnElement="CYC/CYC01">
+            if(ediCYCTransformedProperties["begCentury"] == null){
+            new Integer(_VALUE);
+            }
+        </jb:expression>
+        <jb:expression property="begYear" execOnElement="CYC/CYC02">
+            if(ediCYCTransformedProperties["begYear"] == null){
+            new Integer(_VALUE);
+            }
+        </jb:expression>
+        <jb:expression property="begMonth" execOnElement="CYC/CYC03">
+            if(ediCYCTransformedProperties["begMonth"] == null){
+            new Integer(_VALUE);
+            }
+        </jb:expression>
+        <jb:expression property="endCentury" execOnElement="CYC/CYC01">
+            if(ediCYCTransformedProperties["begCentury"] != null){
+            new Integer(_VALUE);
+            }
+        </jb:expression>
+        <jb:expression property="endYear" execOnElement="CYC/CYC02">
+            if(ediCYCTransformedProperties["begYear"] != null){
+            new Integer(_VALUE);
+            }
+        </jb:expression>
+        <jb:expression property="endMonth" execOnElement="CYC/CYC03">
+            if(ediCYCTransformedProperties["begMonth"] != null){
+            new Integer(_VALUE);
+            }
+        </jb:expression>
+    </jb:bean>
+
+    <jb:bean beanId="ediCVTransformedProperties" class="java.util.HashMap" createOnElement="CV">
+        <jb:value property="cycleStatusCd" data="CV/CV01"/>
+    </jb:bean>
+
+    <jb:bean beanId="commonPropOne" class="java.util.ArrayList" createOnElement="EDI-414">
+        <jb:expression >
+
+        </jb:expression>
+    </jb:bean>
+    
+
+
+</smooks-resource-list>
